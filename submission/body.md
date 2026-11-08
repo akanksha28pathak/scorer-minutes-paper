@@ -244,7 +244,7 @@ makes local results comparable to the scorer's; two runs and a pooled SD make th
 here is specific to Gemma or this competition: any timed, decode-bound agent benchmark can use the same logs and
 commands.
 
-**Reproducibility.** Toolkit and tests (`tools/scorer_minutes/`, Apache-2.0), notebook
-(`tools/scorer_minutes/notebook/`) and data (`docs/paper/aggregates/`): github.com/akanksha28pathak/gemma-4-developer-agent. Data: `speed_table.csv`
+**Reproducibility.** Toolkit and tests (`toolkit/`, Apache-2.0), notebook, data with data card (`data/`) and the
+scripts behind every table: github.com/akanksha28pathak/scorer-minutes-paper. Data: `speed_table.csv`
 (106 runs), `speed_groups.csv` (4.1), `control_43.csv`, `control_twin.csv` and `budget_curve.csv` (4.2), `lora_sessions.csv` (4.4), `timing_coefs.csv` and `timing/` (4.3), `noise_long.csv`
 (task id x run matrix), `run_labels.tsv`; no task content. Serving: vLLM 0.19.1, it-qat-w4a16 checkpoints.

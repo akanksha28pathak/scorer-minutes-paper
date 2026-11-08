@@ -75,7 +75,8 @@ Key results (all from `data/`):
 
 ## Open before submitting
 
-* The paper links to the main repo, which is private until Dec 2: make it public or share it, or judges cannot open it.
+* The paper links to github.com/akanksha28pathak/scorer-minutes-paper, which is private: make it public or share it,
+  or judges cannot open it.
 * Gemini G5 (final) and G3 (resource) reviews.
 """
 

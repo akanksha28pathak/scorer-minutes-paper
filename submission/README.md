@@ -27,7 +27,7 @@ Key results (all from `data/`):
 |---|---|
 | `CHECKLIST.md` | Step-by-step for filling the Kaggle Writeup form (start here) |
 | `FIELDS.md` | Title, subtitle, track, card image, figure captions, links, author, word count |
-| `body.md` | Writeup body to paste (2,944 words with captions; limit 3,000), figures placed after tables 4.1 and 4.2 |
+| `body.md` | Writeup body to paste (2,951 words with captions; limit 3,000), figures placed after tables 4.1 and 4.2 |
 | `card.png`, `fig1_speed.png`, `fig2_control.png` | Card image and the two figures |
 | `notebook/scorer_minutes_demo.ipynb` | Demo notebook, executed: synthetic check of the toolkit, then tables 4.1-4.3 and the noise numbers rebuilt from the data |
 | `data/` | Aggregates behind every table, with a data card (`data/README.md`); task ids anonymized, no task content |
@@ -44,5 +44,6 @@ Key results (all from `data/`):
 
 ## Open before submitting
 
-* The paper links to the main repo, which is private until Dec 2: make it public or share it, or judges cannot open it.
+* The paper links to github.com/akanksha28pathak/scorer-minutes-paper, which is private: make it public or share it,
+  or judges cannot open it.
 * Gemini G5 (final) and G3 (resource) reviews.

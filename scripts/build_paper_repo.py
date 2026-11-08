@@ -11,7 +11,8 @@ Layout of the new repo:
   scripts/      paper scripts (regeneration, figures, review packets, submission and release builders)
   docs/         plan, requirements, review gates and every reviewer's response
 Rebuilds the folder from scratch each time and commits the result (one commit per rebuild). Audited for competition
-task ids, task names and task text before committing; nothing is pushed (no remote is set).
+task ids, task names and task text before committing; pushed only with --push (origin:
+github.com/akanksha28pathak/scorer-minutes-paper, private, created by Akanksha Nov 7).
 """
 from __future__ import annotations
 
@@ -53,6 +54,7 @@ Run the toolkit tests: `cd toolkit && PYTHONPATH=src python3 -m pytest -q tests`
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", default=os.path.expanduser("~/gemma4_work/scorer-minutes-paper"))
+    ap.add_argument("--push", action="store_true", help="push to the repo's origin after committing")
     a = ap.parse_args()
     out = Path(a.out)
     subprocess.run([sys.executable, str(ROOT / "scripts/paper/build_submission.py")], check=True)
@@ -93,6 +95,8 @@ def main() -> None:
     head = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
     if git("status", "--porcelain").stdout.strip():
         git("commit", "-q", "-m", f"Rebuild from main repo {head} (scripts/paper/build_paper_repo.py)")
+    if a.push:
+        git("push", "-q", "origin", "main")
     files = sum(1 for f in out.rglob("*") if f.is_file() and ".git" not in f.parts)
     print(f"{out}: {files} files, audit OK, {git('log', '--oneline', '-1').stdout.strip()}")
 
