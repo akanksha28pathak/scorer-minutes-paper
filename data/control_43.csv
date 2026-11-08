@@ -1,0 +1,8 @@
+setup,runs,factor,wall_cap_min,scorer_min,tasks,solved,timed_out,timed_out_solved,both,scorer_only,run_only,mcnemar_p_vs_scorer
+"Kaggle 4x L4, 1 session (scorer)",gemma4-eval-g31-v12e-l4seq55+gemma4-eval-g31-v12e-l4seq55b,1.02,7.0,6.9,55,19,11,0,19,0,0,
+"H100 SXM, 5 sessions, converted",gemma4-eval-g31-v12e-h100-conv,0.65,4.8,7.4,55,19,11,0,16,3,3,1.0
+"RTX PRO 6000, 5 sessions, converted",gemma4-eval-g31-v12e-train55-ctl,0.9,6.0,6.7,55,19,15,0,18,1,1,1.0
+"L40S, 5 sessions, converted",gemma4-eval-g31-v12e-l40s-conv,1.63,11.7,7.2,55,20,7,0,17,2,3,1.0
+"Kaggle 4x L4, 10 sessions, converted",gemma4-eval-g31-v12e-l4ctl-conv15,2.4,15.0,6.3,55,20,8,0,17,2,3,1.0
+"Kaggle 4x L4, 10 sessions, nominal",gemma4-eval-g31-v12e-l4ctl-nom7,2.55,7.0,2.7,55,15,37,0,14,5,1,0.219
+"A100, 5 sessions (earlier reference)",gemma4-eval-g31-v12e-train55,1.08,7.0,6.5,55,17,12,0,14,5,3,0.727

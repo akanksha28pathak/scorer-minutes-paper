@@ -1,0 +1,7 @@
+setup,runs,calls,r2_min,c_overhead_s,a_s_per_k_prompt,b_s_per_k_gen,d_s_per_k_gen_per_k_ctx,decode_tok_s_0k,decode_tok_s_24k
+"Kaggle 4x L4, 1 session (scorer)",gemma4-eval-g31-v12e-l4seq55+gemma4-eval-g31-v12e-l4seq55b,1417,0.999,0.12,0.46,26.6,0.19,37.5,32.1
+"Kaggle 4x L4, 10 sessions",gemma4-eval-g31-v12e-l4ctl-conv15+gemma4-eval-g31-v12e-l4ctl-nom7,2480,0.955,0.41,0.89,62.5,0.23,16.1,14.7
+"H100 SXM, 5 sessions",gemma4-eval-g31-v12e-h100-conv,1498,0.985,0.08,0.25,17.0,0.14,58.8,48.9
+"L40S, 5 sessions",gemma4-eval-g31-v12e-l40s-conv,1549,0.988,0.22,0.39,45.5,0.07,22.0,21.2
+"RTX PRO 6000, 5 sessions (v15, held-out)",gemma4-eval-g31-v15-val55-p1+gemma4-eval-g31-v15-val55-p2,3047,0.99,0.26,0.17,23.5,0.08,42.6,39.5
+"RTX PRO 6000, 5 sessions, + adapter B (held-out)",gemma4-eval-g31-v15-sft-val55-p1+gemma4-eval-g31-v15-sft-val55-p2,2659,0.991,0.08,0.24,26.3,0.07,38.0,35.6

@@ -1,0 +1,68 @@
+{
+ "sessions": 71,
+ "model_share_median": 0.9654,
+ "other_seconds_median": 7.72,
+ "shares_of_model_time": {
+  "overhead": 0.0045,
+  "prefill": 0.0437,
+  "decode": 0.9518
+ },
+ "tok_s_by_context": [
+  {
+   "context_k": "0-8",
+   "calls": 556,
+   "tok_s": 32.7
+  },
+  {
+   "context_k": "8-16",
+   "calls": 695,
+   "tok_s": 34.69
+  },
+  {
+   "context_k": "16-24",
+   "calls": 7,
+   "tok_s": 35.66
+  },
+  {
+   "context_k": "24-32",
+   "calls": 0,
+   "tok_s": null
+  },
+  {
+   "context_k": ">=32",
+   "calls": 0,
+   "tok_s": null
+  }
+ ],
+ "early_vs_late": {
+  "sessions": 71,
+  "early_tok_s": 30.89,
+  "late_tok_s": 33.53,
+  "late_over_early": 1.086
+ },
+ "flagged_sessions": 5,
+ "fit": {
+  "calls": 1258,
+  "r2": 0.97,
+  "coef": {
+   "overhead": 0.0652,
+   "new_prompt_k": 0.40057,
+   "gen_k": 28.30516,
+   "gen_x_ctx_k": -0.00847
+  },
+  "prefill_tok_s": 2496.4,
+  "decode_tok_s_at_context_k": {
+   "0": 35.33,
+   "8": 35.41,
+   "16": 35.5,
+   "24": 35.58,
+   "32": 35.67
+  }
+ },
+ "input": {
+  "files": 71,
+  "records": 1262,
+  "skipped": 4,
+  "calls_without_prompt_tokens": 0
+ }
+}

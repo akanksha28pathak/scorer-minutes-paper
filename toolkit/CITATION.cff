@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+message: "If you use scorer-minutes, please cite it as below."
+title: "scorer-minutes: hardware-normalized, noise-aware evaluation of coding agents under wall-clock budgets"
+version: 0.1.0
+date-released: 2026-11-10
+license: Apache-2.0
+authors:
+  - name: "Akanksha Pathak"

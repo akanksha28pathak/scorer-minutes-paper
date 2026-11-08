@@ -1,0 +1,5 @@
+run,label,wall_cap_min,factor,scorer_min,tasks,solved,timed_out
+gemma4-eval-g31-v12e-rtx-b35,3.5 scorer min,3.1,0.89,3.5,55,16,35
+gemma4-eval-g31-v12e-train55-ctl,"7 scorer min (control run, table 4.2)",6.0,0.9,6.7,55,19,15
+gemma4-eval-g31-v12e-rtx-b7r,7 scorer min (repeat),6.3,0.88,7.1,55,18,11
+gemma4-eval-g31-v12e-rtx-b10,10 scorer min,9.0,0.9,10.0,55,21,0

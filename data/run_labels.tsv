@@ -1,0 +1,110 @@
+# run folder name<TAB>label (hardware, TP, workers, model). Read by analysis/speed_table.py.
+# Fill on the PC from DECISIONS_31B.md / VAST_LEDGER.md; unlabeled runs still get a row.
+# Labels from each run's run/kaggle_meta.json (GPUs, tp, servers, workers, model); runs without it from the run log
+# + DECISIONS_31B.md / VAST_LEDGER.md. Platform: 4xL4 = Kaggle; A100 / RTX PRO 6000 = Vast.ai; RTX 5080 = local PC.
+gemma4-eval-g31-refdavis-train55	Vast 1xA100 SXM4 80GB, TP1, 5 workers, 31B
+gemma4-eval-g31-refdavis-val55	Vast 1xA100 SXM4 80GB, TP1, 5 workers, 31B
+gemma4-eval-g31-v11m-seq5	Kaggle 4xL4, TP4, 1 workers, 31B
+gemma4-eval-g31-v12-smoke5	Vast 1xA100 PCIe 80GB, TP1, 5 workers, 31B (stopped/partial, no meta)
+gemma4-eval-g31-v12-smoke5c	Vast 1xA100 PCIe 80GB, TP1, 5 workers, 31B (stopped/partial, no meta)
+gemma4-eval-g31-v12-train55-p1-oldprompt-7d906a3	Vast 1xA100 PCIe 80GB, TP1, 5 workers, 31B (stopped/partial, no meta)
+gemma4-eval-g31-v12-train55-p1	Vast 1xA100 PCIe 80GB, TP1, 5 workers, 31B
+gemma4-eval-g31-v12-train55-p2	Vast 1xA100 PCIe 80GB, TP1, 5 workers, 31B
+gemma4-eval-g31-v12b-train55-p1	Vast 1xA100 PCIe 80GB, TP1, 5 workers, 31B
+gemma4-eval-g31-v12b-val55	Vast 1xA100 PCIe 80GB, TP1, 5 workers, 31B
+gemma4-eval-g31-v12d-train55-p1	Vast 1xA100 PCIe 80GB, TP1, 5 workers, 31B
+gemma4-eval-g31-v12d-train55-p2	Vast 1xA100 PCIe 80GB, TP1, 5 workers, 31B
+gemma4-eval-g31-v12e-2x-hard30	Kaggle 4xL4, TP4, 10 workers, 31B
+gemma4-eval-g31-v12e-rft-train55	Vast 1xA100 SXM4 80GB, TP1, 5 workers, 31B + LoRA rft-g31-v12e-r2-r16
+gemma4-eval-g31-v12e-rft-val55	Vast 1xA100 SXM4 80GB, TP1, 5 workers, 31B + LoRA rft-g31-v12e-r2-r16 (stopped/partial, no meta)
+gemma4-eval-g31-v12e-smsub50-p1	Vast 1xA100 SXM4 80GB, TP1, 5 workers, 31B
+gemma4-eval-g31-v12e-smtrain-p1	Vast 1xA100 SXM4 80GB, TP1, 5 workers, 31B (stopped/partial, no meta)
+gemma4-eval-g31-v12e-ss-smoke10	Vast 1xA100 PCIe 80GB, TP1, 5 workers, 31B
+gemma4-eval-g31-v12e-ss50-p1-partial-reboot	Vast 1xA100 PCIe 80GB, TP1, 5 workers, 31B (stopped/partial, no meta)
+gemma4-eval-g31-v12e-ss50-p1	Vast 1xA100 PCIe 80GB, TP1, 5 workers, 31B
+gemma4-eval-g31-v12e-ss50-p2	Vast 1xA100 PCIe 80GB, TP1, 5 workers, 31B
+gemma4-eval-g31-v12e-t03-smsub50-p2	Vast 1xA100 SXM4 80GB, TP1, 5 workers, 31B (stopped/partial, no meta)
+gemma4-eval-g31-v12e-t03-smsub50-p2b	Vast 1xA100 SXM4 80GB, TP1, 5 workers, 31B (stopped/partial, no meta)
+gemma4-eval-g31-v12e-t03-smsub50-p2c	Vast 1xA100 SXM4 80GB, TP1, 5 workers, 31B (stopped/partial, no meta)
+gemma4-eval-g31-v12e-t03-smsub50-p2d	Vast 1xA100 SXM4 80GB, TP1, 5 workers, 31B (stopped/partial, no meta)
+gemma4-eval-g31-v12e-train55-cap45	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B (stopped/partial, no meta)
+gemma4-eval-g31-v12e-train55-ctl	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v12e-train55	Vast 1xA100 SXM4 80GB, TP1, 5 workers, 31B
+gemma4-eval-g31-v12e-val55	Vast 1xA100 SXM4 80GB, TP1, 5 workers, 31B
+gemma4-eval-g31-v14-hard25b	Kaggle 4xL4, TP4, 10 workers, 31B
+gemma4-eval-g31-v15-hint1-hard25	Vast 1xRTX PRO 6000 Blackwell, TP1, 2 workers, 31B (stopped/partial, no meta)
+gemma4-eval-g31-v15-hint1b-rerun	Vast 1xRTX PRO 6000 Blackwell, TP1, 2 workers, 31B
+gemma4-eval-g31-v15-hint1b1-hard25	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15-hint2-hard25	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15-hint2-rerun	Vast 1xRTX PRO 6000 Blackwell, TP1, 1 workers, 31B
+gemma4-eval-g31-v15-hint2b-hard25	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15-smithbig-p1	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B (in progress at labeling, Nov 5)
+gemma4-eval-g31-v15-smithhint-l1b	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B (in progress at labeling, Nov 5)
+gemma4-eval-g31-v15-smithtrain-p1	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15-smithtrain-p2	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15-train55-p1	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15-train55-p2	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15a-hard25	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15b-hard25-p1	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15b-hard25-p2	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15c-hard25	Kaggle 4xL4, TP4, 10 workers, 31B
+gemma4-eval-g31-v9b-fair10	Kaggle 4xL4, TP4, 10 workers, 31B
+gemma4-eval-g31-v9c-71-cap13	Kaggle 4xL4, TP4, 10 workers, 31B
+gemma4-eval-g31-v9c-cal5-smoke	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v9c-fair10	Kaggle 4xL4, TP4, 10 workers, 31B
+gemma4-eval-g31-v9c-train55-p1	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v9c-train55-p2	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v9c-train55-x3	Vast 1xA100 PCIe 80GB, TP1, 12 workers (3 attempts x 4 workers in parallel), 31B (stopped/partial, no meta)
+gemma4-eval-g31-v9d-train55-a-oldprompt-93e7618	Vast 1xA100 PCIe 80GB, TP1, 5 workers, 31B (stopped/partial, no meta)
+gemma4-eval-g31-v9d-train55-a-partial-1ee45fe	Vast 1xA100 PCIe 80GB, TP1, 5 workers, 31B (stopped/partial, no meta)
+gemma4-eval-g31-v9d-train55-a	Vast 1xA100 PCIe 80GB, TP1, 5 workers, 31B
+gemma4-eval-g31-v9d-train55-b	Vast 1xA100 PCIe 80GB, TP1, 5 workers, 31B
+gemma4-eval-gen-g12-never18	local PC 1xRTX 5080, TP1, 5 workers, 12B
+gemma4-eval-gen-l0-p35	local PC 1xRTX 5080, TP1, 5 workers, E4B
+gemma4-eval-gen-l1-p35	local PC 1xRTX 5080, TP1, 5 workers, E4B
+gemma4-eval-gen-s0	local PC 1xRTX 5080, TP1, 5 workers, E4B
+gemma4-eval-gen-s0smoke	local PC 1xRTX 5080, TP1, 5 workers, E4B
+gemma4-eval-v8b-71	Kaggle 4xL4, TP1 x4 servers, 36 workers, E4B
+gemma4-eval-v8c-71	local PC 1xRTX 5080, TP1, 5 workers, E4B
+gemma4-eval-v8d-71	local PC 1xRTX 5080, TP1, 5 workers, E4B
+gemma4-eval-v8d-diag20	Kaggle 4xL4, TP1 x4 servers, 20 workers, E4B
+gemma4-eval-v9-71	Kaggle 4xL4, TP1 x4 servers, 36 workers, E4B
+gemma4-eval-v9-base-71	Kaggle 4xL4, TP1 x4 servers, 36 workers, E4B
+gemma4-eval-v9-rich3454	local PC 1xRTX 5080, TP1, 2 workers, E4B
+gemma4-eval-v9-rich3454b	local PC 1xRTX 5080, TP1, 2 workers, E4B
+gemma4-eval-v9-two	local PC 1xRTX 5080, TP1, 4 workers, E4B
+gemma4-eval-v9-two3	local PC 1xRTX 5080, TP1, 4 workers, E4B
+gemma4-teacher-tr-20261028-bench10-26b-a	Kaggle 4xL4, TP4, 4 workers, 26B-A4B teacher
+gemma4-teacher-tr-20261028-bench10-26b-b	Kaggle 4xL4, TP4, 8 workers, 26B-A4B teacher
+gemma4-teacher-tr-20261028-bench10-26b-c	Kaggle 4xL4, TP4, 8 workers, 26B-A4B teacher
+gemma4-teacher-tr-20261028-bench10-26b-d	Kaggle 4xL4, TP2 x2 servers, 8 workers, 26B-A4B teacher
+gemma4-teacher-tr-20261028-practice35-26b-a	Kaggle 4xL4, TP4, 7 workers, 26B-A4B teacher
+gemma4-teacher-tr-20261028-practice35fast-26b-a	Kaggle 4xL4, TP2 x2 servers, 6 workers, 26B-A4B teacher
+gemma4-teacher-tr-20261028-practiceext-26b-a	Kaggle 4xL4, TP4, 7 workers, 26B-A4B teacher
+gemma4-teacher-tr-20261028-practicesmoke3-26b-a	Kaggle 4xL4, TP4, 3 workers, 26B-A4B teacher
+gemma4-teacher-tr-20261031-never26-26b-v9	Kaggle 4xL4, TP2 x2 servers, 8 workers, 26B-A4B teacher
+gemma4-eval-g31-v15-gym-hint1b	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15-gym-rest	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15-gym-smoke5	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15-gym-x2	Vast 1xRTX PRO 6000 Blackwell, TP1, 10 workers (2 attempts x 5 workers in parallel), 31B
+gemma4-eval-g31-v15-hard21-x2	Vast 1xRTX PRO 6000 Blackwell, TP1, 10 workers (2 attempts x 5 workers in parallel), 31B
+gemma4-eval-g31-v15-sft-train55-p1	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B + LoRA rft-g31-v15-r4-r16
+gemma4-eval-g31-v15-sft-val55-p1	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B + LoRA rft-g31-v15-r4-r16
+gemma4-eval-g31-v15-sft-val55-p2	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B + LoRA rft-g31-v15-r4-r16
+gemma4-eval-g31-v15-smithbig-hint1b	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15-smithhint-l2	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15-val55-p1	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15-val55-p2	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15c-train30	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v15d-train55-p1	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B
+gemma4-eval-g31-v12e-l4ctl-conv15	Kaggle 4xL4, TP4, 10 workers, 31B (control: converted cap 15 min)
+gemma4-eval-g31-v12e-l4ctl-nom7	Kaggle 4xL4, TP4, 10 workers, 31B (control: nominal cap 7 min)
+gemma4-eval-g31-v12e-h100-smoke5	Vast 1xH100 SXM 80GB, TP1, 5 workers, 31B (calibration smoke)
+gemma4-eval-g31-v12e-h100-conv	Vast 1xH100 SXM 80GB, TP1, 5 workers, 31B (converted cap 4.8 min)
+gemma4-eval-g31-v12e-l40s-smoke5	Vast 1xL40S 48GB, TP1, 5 workers, 31B (calibration smoke)
+gemma4-eval-g31-v12e-l40s-conv	Vast 1xL40S 48GB, TP1, 5 workers, 31B (converted cap 11.7 min)
+gemma4-eval-g31-v12e-l4seq55	Kaggle 4xL4, TP4, 1 workers, 31B (scorer setup, part 1)
+gemma4-eval-g31-v12e-l4seq55b	Kaggle 4xL4, TP4, 1 workers, 31B (scorer setup, part 2)
+gemma4-eval-g31-v12e-rtx-b35	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B (budget curve, cap 3.1 min = 3.5 scorer min)
+gemma4-eval-g31-v12e-rtx-b7r	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B (budget curve, cap 6.3 min = 7 scorer min, repeat)
+gemma4-eval-g31-v12e-rtx-b10	Vast 1xRTX PRO 6000 Blackwell, TP1, 5 workers, 31B (budget curve, cap 9.0 min = 10 scorer min)
