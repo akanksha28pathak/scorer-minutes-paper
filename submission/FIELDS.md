@@ -15,5 +15,5 @@ Fill these into the Writeup form (Akanksha, Nov 9). Everything to paste or uploa
 * **Links:** github.com/akanksha28pathak/scorer-minutes-paper (the paper repo: toolkit, data, notebook, scripts,
   submission folder; built from the main repo by `scripts/paper/build_paper_repo.py`, no competition data). **Open:**
   it is private; make it public (or share it) before submitting, or judges cannot open it.
-* **Word count:** body 2,922 of 3,000 (2,944 with the figure captions; `python3 scripts/paper/build_submission.py`).
+* **Word count:** body 2,929 of 3,000 (2,951 with the figure captions; `python3 scripts/paper/build_submission.py`).
 * **Authors:** Akanksha Pathak (sole author, confirmed Nov 7).
