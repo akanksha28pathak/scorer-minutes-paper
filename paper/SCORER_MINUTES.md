@@ -1,4 +1,4 @@
-# Scorer-minutes: hardware-normalized, noise-aware evaluation of coding agents under wall-clock budgets
+# Scorer-minutes: hardware-normalized, noise-aware evaluation of coding agents
 
 ## Abstract
 
@@ -115,7 +115,7 @@ All 59 full 31B runs by setup (Figure 1); tokens/s = each run's median per-sessi
 | Kaggle 4x L4, TP4 | 10 | 6 (261) | 14.1 (13.2-15.8) | 2.13-2.55 |
 
 (1) **Concurrency matters as much as the GPU**: the scorer's own hardware at 10 sessions runs at factors 2.1-2.6, and
-the "attempts" rows (2 or 3 attempts per task at once, so 10 or 12 sessions) drop the RTX PRO 6000 from 38.2 to 26.4
+the "attempts" rows (2 or 3 attempts per task at once, so 10 or 12 sessions) drop the RTX PRO 6000 from 38.1 to 26.4
 tokens/s and the A100 (partial run) from 30.5 to 16.9. (2) **Small changes move the factor**: a LoRA adapter cost
 7-16% of speed (Section 4.4). (3) **Speed is stable within a setup** (A100: factors 1.01-1.16 over 16 runs) **but not
 across nominally equal ones**: E4B runs on one RTX 5080 at 5 sessions ranged from 24 to 90 tokens/s, unexplained by
@@ -179,8 +179,8 @@ run-level factor absorbs it. The exception is heavy sharing: at 10 sessions, lat
 
 ### 4.4 A LoRA adapter changes the factor
 
-Adapter B (rank 16, tuned on solved sessions) on the RTX PRO 6000: 35.4 vs 38.2 tokens/s; the fit puts the
-cost in decode (`b` +12%; +10% at 24k context). Overhead `c` falls while prefill `a` rises; the
+Adapter B (rank 16, tuned on solved sessions) on the RTX PRO 6000: 35.4 vs 38.1 tokens/s; the fit puts the
+cost in decode (`b` +12%; +11% at 24k context). Overhead `c` falls while prefill `a` rises; the
 two are hard to separate in the fit, so we do not read them individually. In two held-out runs the adapter changed no score
 beyond noise (20.5 vs 19.0 of 55) but lengthened sessions by 12%, moving the projected scorer time from 10.3-10.8 h to
 11.6-12.1 h of the 12-hour limit. Adapter A on an A100: 16% slower than its paired base run. Recalibrate after any
@@ -211,7 +211,7 @@ train task-level SD of a difference (1.3 run-level SD), no more than identical r
 Public scores are single draws on ~58 hidden tasks. Resubmissions of identical files vary with an SD of 1.4-1.8 tasks
 [D. Afshar; forum]: one public notebook that scored 13/58 scored 7 and 9 for others who resubmitted it, and 9 for us.
 With SD 1.6, one draw's 95% interval is about +-3 tasks (`draws --sd 1.6 --score 9`: 5.9-12.1). Levels also differ
-(24-40% of local splits vs 5-17% of hidden tasks: unseen private repositories), which no noise model explains.
+(24-40% of local splits vs 5-18% of hidden tasks: unseen private repositories), which no noise model explains.
 
 ## 6. Protocol
 

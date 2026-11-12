@@ -1,7 +1,7 @@
-# Research-track submission: Scorer-minutes: hardware-normalized, noise-aware evaluation of coding agents under wall-clock budgets
+# Research-track submission: Scorer-minutes: hardware-normalized, noise-aware evaluation of coding agents
 
 Kaggle "Google - The Gemma 4 Developer Agent" paper track. Author: Akanksha Pathak. Target prize: **Best New Resource**
-(also judged for Best Paper). Deadline Thu Nov 12 23:59 UTC; our target Tue Nov 10 18:00 ET.
+(also judged for Best Paper). Deadline Thu Nov 12 23:59 UTC (6:59 PM ET).
 
 ## What the paper says
 
@@ -27,7 +27,7 @@ Key results (all from `data/`):
 |---|---|
 | `CHECKLIST.md` | Step-by-step for filling the Kaggle Writeup form (start here) |
 | `FIELDS.md` | Title, subtitle, track, card image, figure captions, links, author, word count |
-| `body.md` | Writeup body to paste (2,951 words with captions; limit 3,000), figures placed after tables 4.1 and 4.2 |
+| `body.md` | Writeup body to paste (2,960 words with captions; limit 3,000), figures placed after tables 4.1 and 4.2 |
 | `card.png`, `fig1_speed.png`, `fig2_control.png` | Card image and the two figures |
 | `notebook/scorer_minutes_demo.ipynb` | Demo notebook, executed: synthetic check of the toolkit, then tables 4.1-4.3 and the noise numbers rebuilt from the data |
 | `data/` | Aggregates behind every table, with a data card (`data/README.md`); task ids anonymized, no task content |
@@ -40,10 +40,8 @@ Key results (all from `data/`):
 * Regenerate every table and figure from the run logs: `bash scripts/paper/scorer_minutes_pc.sh`; rebuild this folder:
   `python3 scripts/paper/build_submission.py` (also audits it for competition task content).
 * Plan, review gates and every reviewer objection with its fix: `docs/paper-track/PLAN.md` and
-  `docs/paper-track/reviews/` (Gemini: G0 3.6, G1 4.1, G1b 4.3, G4 4.6; G5 and G3 pending).
+  `docs/paper-track/reviews/` (Gemini: G0 3.6, G1 4.1, G1b 4.3, G4 4.6).
 
-## Open before submitting
+## Public copy
 
-* The paper links to github.com/akanksha28pathak/scorer-minutes-paper, which is private: make it public or share it,
-  or judges cannot open it.
-* Gemini G5 (final) and G3 (resource) reviews.
+github.com/akanksha28pathak/scorer-minutes-paper (public since Nov 11): toolkit, data, notebook, scripts and this folder.

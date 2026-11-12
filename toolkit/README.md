@@ -14,7 +14,7 @@ solves a different number of tasks on every run. This toolkit measures both from
 | `draws` | How should one leaderboard score be read? | 95% interval of one draw, P(wrong order) for a true margin, runs needed |
 
 Standard library only (Python >= 3.9). Deterministic (seeded bootstrap). Paper: *Scorer-minutes: hardware-normalized,
-noise-aware evaluation of coding agents under wall-clock budgets* (Kaggle Gemma 4 Developer Agent paper track, 2026).
+noise-aware evaluation of coding agents* (Kaggle Gemma 4 Developer Agent paper track, 2026).
 
 **What we found with it** (Gemma 4 31B agents, 106 runs, six GPU models): per-session speed of one model ranges from 13
 to 52 tokens/s across setups; the competition's own 4x L4 is 2.1-2.6x slower per session at 10 parallel sessions than

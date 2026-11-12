@@ -31,7 +31,7 @@ ANALYSIS = ["speed_table.py", "speed_groups.py", "noise_table.py", "control_tabl
             "lora_sessions.py", "budget_curve.py"]
 PAPER_TRACK = ["README.md", "PLAN.md", "1_scorer_minutes.md", "1_scorer_minutes_requirements.md",
                "release_notebook_outline.md"]
-IGNORE = shutil.ignore_patterns("__pycache__", "*.egg-info", "build")
+IGNORE = shutil.ignore_patterns("__pycache__", ".pytest_cache", "*.egg-info", "build")
 
 README = """# Scorer-minutes: research-track paper (all artifacts)
 
