@@ -2,7 +2,7 @@
 
   .venv/bin/python scripts/paper/figures.py [--out docs/paper/figures]
 
-fig2_control.png: the section 4.3 control from docs/paper/aggregates/control_43.csv: solved tasks and sessions cut by
+fig2_control.png: the section 4.2 control from docs/paper/aggregates/control_43.csv: solved tasks and sessions cut by
 the cap per setup (same agent, same 55 tasks), the scorer row highlighted, the unconverted run in a contrasting color.
 fig1_speed.png: per-session decode speed of every full 31B run (>= 20 sessions), one dot per run, grouped by setup,
 against the scorer anchor (logged sequential run on Kaggle 4x L4). The point: concurrency and serving changes move
@@ -36,21 +36,35 @@ GROUPS = [  # (label shown, test on the run label)
 ]
 
 
+def fig2_label(r: dict) -> str:
+    """Plain-language row label: machine, sessions in parallel, and the time limit with its factor."""
+    gpu, sessions = r["setup"].split(", ")[:2]
+    gpu = "4 L4 GPUs" if "4x L4" in gpu else gpu.replace(" SXM", "") + " GPU"
+    cap = f"{float(r['wall_cap_min']):g} min"
+    if "scorer" in r["setup"]:
+        return f"Scorer setup\n{gpu}, 1 session at a time\ntime limit {cap}"
+    kind = "unconverted" if "nominal" in r["setup"] else "converted"
+    return f"{gpu}, {sessions} at once\n{kind} limit {cap} (f = {float(r['factor']):.2f})"
+
+
 def fig2(out_dir: Path) -> Path:
+    from matplotlib.patches import Patch
     rows = [r for r in csv.DictReader(open(AGG / "control_43.csv")) if "earlier reference" not in r["setup"]]
-    labels = [r["setup"].replace(", converted", "\nconverted").replace(", nominal", "\nnominal").replace(" (scorer)", "\n(scorer)")
-              + f"\nf = {float(r['factor']):.2f}" for r in rows]
+    labels = [fig2_label(r) for r in rows]
     colors = [ANCHOR if "nominal" in r["setup"] else (INK if "scorer" in r["setup"] else MARK) for r in rows]
-    fig, axes = plt.subplots(1, 2, figsize=(9.5, 4.4), dpi=200, facecolor=SURFACE, sharey=True)
-    for ax, key, title, xmax in ((axes[0], "solved", "Solved (of 55)", 25), (axes[1], "timed_out", "Sessions timed out by the harness (of 55)", 55)):
+    fig, axes = plt.subplots(1, 2, figsize=(10.5, 5.0), dpi=200, facecolor=SURFACE, sharey=True)
+    panels = ((axes[0], "solved", "Tasks solved", "Number of tasks solved (out of 55)", 25),
+              (axes[1], "timed_out", "Sessions that ran out of time", "Number of sessions stopped by the time limit (out of 55)", 55))
+    for ax, key, title, xlabel, xmax in panels:
         ax.set_facecolor(SURFACE)
         vals = [int(r[key]) for r in rows]
         ys = list(range(len(rows)))[::-1]
         ax.barh(ys, vals, color=colors, height=0.6, edgecolor=SURFACE, linewidth=2)
         for y, v in zip(ys, vals):
-            ax.text(v + xmax * 0.015, y, str(v), va="center", color=INK, fontsize=9)
+            ax.text(v + xmax * 0.015, y, str(v), va="center", color=INK, fontsize=9.5)
         ax.set_xlim(0, xmax)
-        ax.set_title(title, color=INK, loc="left", fontsize=10)
+        ax.set_title(title, color=INK, loc="left", fontsize=10.5, fontweight="bold")
+        ax.set_xlabel(xlabel, color=INK, fontsize=9.5, labelpad=6)
         ax.grid(axis="x", color=GRID, lw=0.8)
         ax.set_axisbelow(True)
         for side in ("top", "right", "left"):
@@ -58,10 +72,15 @@ def fig2(out_dir: Path) -> Path:
         ax.spines["bottom"].set_color(GRID)
         ax.tick_params(colors=MUTED, labelsize=8.5)
         ax.tick_params(axis="y", length=0)
-    axes[0].set_yticks(list(range(len(rows)))[::-1], labels, fontsize=8, color=INK)
-    fig.suptitle("One agent, 55 tasks, six setups: converted caps match the scorer, the nominal cap does not",
+    axes[0].set_yticks(list(range(len(rows)))[::-1], labels, fontsize=8.5, color=INK)
+    fig.suptitle("Same agent, same 55 tasks, six setups: converted time limits match the scorer, the unconverted limit does not",
                  color=INK, x=0.01, ha="left", fontsize=11)
-    fig.tight_layout()
+    fig.legend(handles=[Patch(color=INK, label="Scorer setup (reference)"),
+                        Patch(color=MARK, label="Other machine, time limit converted with the speed factor f"),
+                        Patch(color=ANCHOR, label="Other machine, scorer's 7-minute limit kept unconverted")],
+               loc="lower left", bbox_to_anchor=(0.01, 0.0), ncol=3, frameon=False, fontsize=8.5, labelcolor=INK,
+               handlelength=1.2, columnspacing=1.6)
+    fig.tight_layout(rect=(0, 0.06, 1, 1))
     out = out_dir / "fig2_control.png"
     fig.savefig(out, facecolor=SURFACE)
     return out

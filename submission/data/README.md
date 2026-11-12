@@ -12,11 +12,31 @@ task ids in `noise_long.csv` are replaced by `t001`... (stable within a split). 
 | `control_43.csv` | control setup (paper table 4.2) | `setup`, `runs`, `factor` (full run), `wall_cap_min` (set before the run), `scorer_min` = cap / factor, `solved`, `timed_out` (harness timeout field), `timed_out_solved`, paired counts vs the scorer (`both`, `scorer_only`, `run_only`), exact McNemar p |
 | `control_twin.csv` | pair | converted vs nominal cap on the same hardware: tasks solved only by each, exact McNemar p |
 | `budget_curve.csv` | run (paper section 4.2) | one agent, one setup, caps for 3.5 / 7 / 10 scorer minutes: factor, scorer minutes, solved, timed out |
-| `lora_sessions.csv` | setup (paper section 4.4) | mean / median session seconds with and without adapter B (110 sessions each), ratio, projected hours |
-| `timing_coefs.csv` | setup (paper table 4.3) | fitted `t = c + a*new_prompt + b*gen + d*gen*context` (seconds, tokens in thousands): `c_overhead_s`, `a_s_per_k_prompt`, `b_s_per_k_gen`, `d_s_per_k_gen_per_k_ctx`, decode tokens/s at 0k and 24k context |
+| `lora_sessions.csv` | setup (paper section 4.1) | mean / median session seconds with and without adapter B (110 sessions each), ratio, projected hours |
+| `timing_coefs.csv` | setup (paper section 4.3) | fitted `t = c + a*new_prompt + b*gen + d*gen*context` (seconds, tokens in thousands): `c_overhead_s`, `a_s_per_k_prompt`, `b_s_per_k_gen`, `d_s_per_k_gen_per_k_ctx`, decode tokens/s at 0k and 24k context |
 | `timing/<run>.json` | logged run | output of `scorer-minutes timing`: model share, time split, tokens/s per context bin, early vs late calls, the fit (per-session flags reduced to a count) |
 | `noise_long.csv` | (run, task) | `config` (agent version), `split` (`train`, `held-out`; 55 tasks each), `run`, `task` (anonymized), `solved` (0/1) |
 | `run_labels.tsv` | logged run | run name, hardware label |
 
 Grading: the competition's sandbox image, strict (all hidden tests must pass). The scorer reference is a sequential run
 (one session at a time) on Kaggle 4x L4 with tensor parallelism 4, the competition's scoring setup.
+
+## Tasks and splits
+
+The tasks themselves are not in this repository: the competition rules forbid redistributing them. They are on the
+competition's data page (kaggle.com/competitions/gemma-4-developer-agent/data), together with the agent program and its
+documentation (`HARNESS_README.md`).
+
+* **Public tasks:** 129, from four open-source Python projects (FastAPI 67, Rich 48, Requests 13, httpx 1). Each task
+  carries the project's code just before a real bug fix (a repository snapshot at a named commit), the bug report, the
+  maintainers' fix, and the tests that the fix makes pass.
+* **Pool used here:** the 110 tasks (63 FastAPI, 47 Rich) on which the maintainers' fix passes in our grading sandbox.
+* **`train`** (55 tasks: 31 FastAPI, 24 Rich): used to develop agents. The control experiment (paper section 4.2) runs
+  on it.
+* **`held-out`** (55 tasks: 32 FastAPI, 23 Rich): never used for development, only measured. The two splits share no
+  task.
+* **Hidden test set:** about 120 tasks from private repositories, scored only by Kaggle (about 58 of them on the public
+  leaderboard). None of our files contains results on it except the public scores quoted in the paper.
+
+Task ids are anonymized (`t001`...), so rows of `noise_long.csv` can be compared across runs but not mapped back to a
+competition task.

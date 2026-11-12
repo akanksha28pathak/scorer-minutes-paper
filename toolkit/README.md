@@ -95,7 +95,7 @@ scorer-minutes draws --sd 1.6 --score 9
 `docs/paper/aggregates/` (repo root) holds the aggregates behind every table of the paper (no task content; data card
 in its README):
 `speed_table.csv` (one row per logged run: speed, factor, time split), `speed_groups.csv` (table 4.1),
-`control_43.csv` and `control_twin.csv` (table 4.2, the control), `lora_sessions.csv` (section 4.4), `timing_coefs.csv` and `timing/` (table 4.3, per-run fits),
+`control_43.csv` and `control_twin.csv` (table 4.2, the control), `lora_sessions.csv` (section 4.1), `timing_coefs.csv` and `timing/` (section 4.3, per-run fits),
 `noise_long.csv` (task x run solved matrix, section 5), `run_labels.tsv` (hardware per run).
 `notebook/scorer_minutes_demo.ipynb` recovers known speeds from synthetic logs and rebuilds the paper's tables and
 figures from those aggregates.

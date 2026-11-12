@@ -75,7 +75,7 @@ for j in "$OUT"/timing/*.json; do
   "$PY" -c "import json,sys; d=json.load(open(sys.argv[1])); d['flagged_sessions']=len(d.get('flagged_sessions',[])); print(json.dumps(d,indent=1))" "$j" \
     > "$DATA/timing/$(basename "$j")"
 done
-echo "== 7. paper tables 4.1, 4.3, 4.4 and figures"
+echo "== 7. paper tables (4.1, timing fits, adapter sessions) and figures"
 "$PY" analysis/speed_groups.py > "$DATA/speed_groups.md"
 "$PY" analysis/control_table.py > /dev/null
 "$PY" analysis/timing_coef_table.py > "$DATA/timing_coefs.md"

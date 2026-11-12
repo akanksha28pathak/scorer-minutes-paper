@@ -2,104 +2,106 @@
 
 ## Abstract
 
-Coding-agent benchmarks increasingly cap each session by wall-clock time, as this competition does. Such a cap mixes
-what the agent does with how fast the serving stack decodes: teams developing on other GPUs, or at other concurrency,
-get a different amount of model work from the same minutes. We propose measuring budgets in **scorer
-minutes**: wall minutes divided by a speed factor *f*, the scorer's tokens per second over the development setup's,
-measured from ordinary per-call logs. We release **scorer-minutes**, a dependency-free toolkit and protocol that
-computes the factor and the wall cap, checks from the same logs whether one factor is enough, and reports run noise. Across 106 runs (4,757 sessions) of Gemma 4 agents on six GPU models, the same 31B model decodes at 13 to 52
-tokens/s per session, and the scorer's own 4x L4 at 10 concurrent sessions is **2.1-2.6x** slower per session than the scorer
-reference (one session at a time). In a control (one agent, 55 tasks), the scorer setup solved **19**; runs converted to the same
-budget on four other setups (factors 0.65-2.40) solved **19-20**; the unconverted run on the scorer's hardware at 10
-sessions solved **15**, with 37 of 55 sessions timed out. Identical runs differ by an SD of **1.1-1.7 tasks of 55**:
-one run each ranks a true 2-task difference wrongly 11-20% of the time.
+Benchmarks for AI coding agents commonly limit the time an agent may spend on each task. Such a limit, however,
+measures the computer as much as the agent: a slow machine completes less model work in 7 minutes than a fast one, so
+the same agent obtains different scores on different machines. Previous work has examined how agents react to a time
+budget, but not how a time limit should be converted between machines. In this work, we propose **scorer minutes**:
+the minutes spent on a machine divided by a speed factor *f*, which states how much slower that machine is than the
+official scoring machine (the "scorer") and is measured from the logs of any agent run. We release
+**scorer-minutes**, a toolkit and a protocol that compute the factor and the time limit to set, check whether one
+factor is sufficient, and report the variation between identical runs. Experiments were performed in a Kaggle
+competition in which an agent built on Google's Gemma 4 model fixes bugs in Python projects. Across 106 runs on six
+kinds of GPU, the same model wrote 13 to 52 tokens (word pieces) per second. In a control experiment (one agent, 55
+tasks), the scorer's setup solved **19** tasks; four other machines with converted time limits solved **19-20**; a
+2.6x slower machine that kept the scorer's 7-minute limit solved **15** and ran out of time on 37 tasks. Identical
+runs differed by a standard deviation (SD) of **1.1-1.7 tasks of 55**, so one run per agent ranks a true 2-task
+difference wrongly 11-20% of the time. The study shows that time-limited results can be made comparable across
+machines from logs alone.
 
 ## 1. Introduction
 
-This competition scores an agent (prompts, tools, optional LoRA adapter) on about 120 hidden tasks from private Python
-repositories: the share whose hidden tests pass. Each session runs under a cap set by the submitter, and all sessions
-must finish within 12 hours on 4x NVIDIA L4, one session at a time, one vLLM server with tensor parallelism over the 4
-GPUs ("TP4"), serving quantized (w4a16) Gemma 4 checkpoints.
+**The competition.** In Kaggle's "Gemma 4 Developer Agent" competition (kaggle.com/competitions/gemma-4-developer-agent),
+participants build an *agent* that fixes bugs
+in software. The agent is one of Google's open Gemma 4 language models with a prompt and a few tools: run a shell
+command, read a file, edit a file, submit a fix. A *task* is a copy of a Python project that contains a bug, with a
+written bug report. The agent works in a loop: the model asks for a tool, the tool runs, and its output goes back to the model, until
+the agent submits a fix. One such attempt at one task is a **session**.
+A task is solved if the project's hidden tests pass after the fix. The score is the share of tasks solved.
 
-Nobody develops on the scorer: teams test on rented GPUs or on Kaggle's 4x L4 with many parallel sessions, each
-decoding at a different speed, so "7 minutes" is a different budget on each. Even the scorer's own hardware
-is a different machine at development concurrency: at 10 parallel sessions a 7-minute cap buys 2.7 scorer minutes and
-the same agent loses 4 of 19 tasks (Section 4.2). The reverse error costs too: a cap tuned on a fast machine overruns the
-12-hour limit and scores zero. Noise compounds this: the same agent solves different tasks on every run, so
-one- or two-task differences are read as progress.
+**The scorer and its time limits.** Kaggle scores each submission on about 120 hidden tasks, on a machine we call the
+**scorer**: four NVIDIA L4 GPUs, working on one session at a time. Every session has a limit
+chosen by the participant, the **cap** (ours is 7 minutes); a session that reaches it is stopped. All sessions
+together must finish within 12 hours, or the submission scores nothing.
 
-**The idea** is to treat the cap as a budget of model work, not of minutes: one number per run, the speed factor *f*,
-converts between the two, and a check on the same logs says whether one number is enough.
+**The problem.** Participants get one scored submission per day, so they test elsewhere: on rented GPUs, or on the
+scorer's kind of machine with 10 sessions at once to save time. Each generates text at a different
+speed, so "7 minutes" buys a different amount of work on each. A cap that is fine on a fast machine can break the
+12-hour limit on the scorer; the scorer's cap on a slower machine stops sessions the scorer would let finish. Results are also noisy: the same agent solves different tasks on every run, so a
+gain of one or two tasks may be luck.
 
-**Contributions (the resource).** (1) `scorer-minutes`, a Python-standard-library toolkit (`calibrate`, `timing`,
-`noise`, `draws`) reading OpenAI-style per-call logs and reporting the speed factor, the wall cap, a fitted overhead /
-prefill / decode split, and noise and power estimates. (2) A speed and timing table for 106 runs (82
-of Gemma 4 31B, 14 of E4B, an effective-4B on-device model; 9 of 26B-A4B, a mixture of experts with 4B active parameters; 1 of 12B) across six GPU models and 19 serving setups. (3) A control
-validating the conversion against the scorer's own setup. (4) A repeated-run matrix, its noise table and a one-page
-protocol.
+**The idea.** Treat the cap as a budget of model work, not of minutes. One number per run, the speed factor *f*,
+converts between the two: if your machine generates text half as fast as the scorer, f = 2, and a budget of 7 scorer
+minutes means a 14-minute cap.
 
-Terms: `g31_<version>` is one Gemma 4 31B agent configuration; the **train** split is 55 public
-tasks we develop on, the **held-out** split 55 others we only measure on; a **nominal** cap is the scorer's wall cap
-applied unconverted elsewhere.
+**What we release (the resource).** The `scorer-minutes` toolkit, the speed, timing and noise data of 106 runs
+including a control experiment on the scorer's own setup, and a one-page protocol.
 
 ## 2. Related work
 
-Wang et al. [On the Clock, arXiv 2610.10833] study agents told a wall-clock budget in the prompt: behavior under a
-fixed clock, not what the clock means on different hardware. Benchmarks report wall-clock time as a
-within-environment diagnostic [OpenHarmony Bench, arXiv 2608.16022] or one un-normalized limit [AnalysisBench, arXiv
-2604.11270]; we know of no protocol that converts a cap between setups. For noise, Miller [arXiv 2411.00640] gives standard errors, paired tests and power analysis for LLM evals,
-"On Randomness in Agentic Evals" [arXiv 2602.07150] finds SWE-bench Verified pass@1 shifting 2.2-6.0 points across runs,
-and HAL [arXiv 2510.11977] builds reproducible agent evaluation; we apply these statistics under a time budget. Here,
-public notebooks measure 31B decode speed at one concurrency [P. D. Pereira, "L4 Decode Law & 12-Call
-Cliff"], leaderboard noise [D. Afshar, "58 Tasks, Bronze Is a 124-Team Tie"] and config feasibility [V. Murugan,
-"Budget Feasibility Audit"; netaro, "YaoNeM Pareto Analysis"]; none converts a cap or measures repeated-run noise.
-TraceLab [arXiv 2606.30560] finds frontier-model sessions tool-heavy; ours are model-bound (Section 4.3).
+Wang et al. [On the Clock, arXiv 2610.10833] study how agents react to a stated time budget, not what the clock means
+on different hardware. Benchmarks report wall-clock time within one environment [OpenHarmony Bench, arXiv 2608.16022]
+or apply one limit without normalizing it [AnalysisBench, arXiv 2604.11270]. For noise we follow Miller
+[arXiv 2411.00640]; "On Randomness in Agentic Evals" [arXiv 2602.07150] finds SWE-bench Verified scores shifting
+2.2-6.0 points across runs. In this competition, public notebooks measure model speed at one load level
+[P. D. Pereira, "L4 Decode Law & 12-Call Cliff"], leaderboard noise [D. Afshar, "58 Tasks, Bronze Is a 124-Team Tie"]
+and whether a configuration fits the 12 hours [V. Murugan, "Budget Feasibility Audit"]. We know of no protocol that
+converts a cap between machines or measures repeated-run noise.
 
 ## 3. The resource
 
+The toolkit (Python standard library only) has four commands (`calibrate`, `timing`, `noise`, `draws`). They read OpenAI, LiteLLM or vLLM logs, are deterministic
+and are covered by 16 tests.
+
+
 ### 3.1 Definitions
 
-From each session's per-call logs: session speed `v_s` = completion tokens / time inside model calls (prefill included:
-what a time cap rations); run speed `v = median_s v_s` with a bootstrap CI; **factor** `f = v_ref / v` (f > 1:
-slower than the reference); **scorer minutes** = wall minutes / f, so a budget of *B* scorer minutes is a wall cap of
-`B x f`. `v_ref` is measured on the scoring setup at its real concurrency (`calibrate --reference`): a sequential run on
-4x L4 gave **33.8 tokens/s** (5 sessions, IQR 32.8-34.4), fixed before the Section 4.2 control, whose 56 scorer
-sessions then measured 33.4 and 32.9 in two parts, within 2.5%.
+A language model reads and writes text in **tokens** (pieces of words). Each time the agent calls the model, the model
+first reads its prompt (**prefill**) and then writes its answer (**decode**). Everything below is computed from the
+log of these calls: when each call started and ended, and how many tokens it read and wrote.
+
+* **Session speed** `v_s` = tokens written / time spent in model calls (prefill time included).
+* **Run speed** `v` = the median of `v_s` over all sessions of a run, with a bootstrap confidence interval (CI).
+* **Speed factor** `f = v_ref / v`, where `v_ref` is the speed of the scorer. f > 1 means slower than the scorer.
+* **Scorer minutes** = wall-clock minutes / f. A budget of *B* scorer minutes needs a cap of `B x f` minutes.
+
+The `calibrate` command prints f and the cap. We measured `v_ref` by running sessions one at a time on the scorer's
+kind of machine: **33.8 tokens/s** (5 sessions, IQR 32.8-34.4). The 56 scorer sessions of Section 4.2, run later, measured 33.4 and 32.9 in two parts, within 2.5%.
 
 ### 3.2 When one factor is enough
 
-One factor converts budgets only if session time is dominated by model calls at a roughly constant speed. `timing`
-reports the **model share** (time inside model calls / session wall time), model-free checks (tokens/s by context;
-**late / early**, tokens/s of the last third of each session's calls over the first third), and
-a per-call least-squares fit
+One factor is enough only if sessions spend nearly all their time in model calls, at a roughly constant speed. The
+`timing` command checks this on the same logs. It reports:
 
-`t = c + a * new_prompt + b * gen + d * gen * context` (seconds; tokens in thousands),
+* the **model share**: time in model calls / total session time (the rest is tools);
+* **late / early**: the speed in the last third of each session's calls over the speed in the first third;
+* a fit that splits each call's time into a fixed overhead, prefill per new prompt token, decode per written token, and the slowdown of decode as the conversation grows.
 
-with `c` per-call overhead, `a` prefill per 1k prompt tokens added since the previous call (prefix caching covers the
-rest), `b` decode per 1k generated tokens, and `d` the decode slowdown with context. It flags sessions with model share
-< 0.9 or prefill share > 0.2, from client timestamps and token counts alone.
+It flags sessions with a model share < 0.9 or a prefill share > 0.2.
 
-### 3.3 Noise and design
+## 4. Experimental setup and results
 
-`noise` takes `config, split, run, task, solved` rows and reports per-config and pooled SD (chi-square CI), a task-level
-SD (`sqrt(sum_i p_i(1-p_i) k/(k-1))`, each task a coin with its solve rate p_i over k runs; all tasks, not a few run
-totals), difference CIs, runs needed to detect a margin, and the chance one
-run each ranks two agents wrongly; `draws` does the same for single leaderboard scores. The toolkit is standard library
-only, reads OpenAI, LiteLLM or vLLM logs via configurable field paths, is deterministic, and has 16 tests (the fit
-recovers known prefill and decode speeds from synthetic logs). One script regenerates every table and figure.
+* **Tasks.** The competition publishes 129 practice tasks from four open-source Python projects. Each task carries the project's code just before a real bug fix, the bug report, the maintainers' fix, and the tests that the fix makes pass. We use the 110 tasks (63 from FastAPI, 47 from Rich) on which the maintainers' fix passes in our grading sandbox, in two halves that share no task: **train** (55 tasks: 31 FastAPI, 24 Rich), on which we develop agents, and **held-out** (55: 32 and 23), on which we only measure. The control experiment (4.2) uses train; the noise study (5) uses both.
+* **Grading.** After a session, the task's tests, which the agent never sees, run in the competition's official software image; a task is solved only if all pass.
+* **Model.** Gemma 4 in the compressed ("quantized") versions the competition provides. 82 of our 106 runs use the largest, 31B (31 billion parameters); the rest use smaller ones (E4B 14, 26B-A4B 9, 12B 1).
+* **Model server.** On each machine the model runs in one vLLM server, an open-source program that loads the model on the GPUs and answers the agent's calls. Sessions that run at once share the server, so each one gets slower.
+* **Machines.** The scorer's kind of machine is available in Kaggle notebooks: four L4 GPUs ("4x L4"), with the model split across them ("TP4"). Running one session at a time, as the official scoring does, it is our **scorer setup**. We also ran it with 10 sessions at once, and rented single, larger GPUs (H100, A100, RTX PRO 6000, L40S) with 5 sessions at once unless noted. A **setup** is a machine together with its number of parallel sessions.
+* **Agent.** A name such as g31_v12e denotes one configuration (prompt, tools, limits) of our 31B agent, run by the competition's own agent program. A session ends when the agent submits, after 28 tool calls, or at the cap; a session stopped by the cap is **timed out**.
+* **Runs.** A run is one pass of one agent over a task list on one setup. Of 106 logged runs (4,757 sessions), 76 are full (>= 20 sessions; 4,542 sessions).
+* **Budgets and caps.** The budget is 7 scorer minutes unless noted. A **converted** cap is the budget multiplied by the setup's f. A **nominal** cap is the scorer's 7 minutes used unchanged.
 
-## 4. Validation
+### 4.1 Speed depends on the GPU and on how many sessions share it
 
-All runs use Gemma 4 agents in the competition's harness and sandbox image, vLLM serving, graded as the scorer does
-(all hidden tests must pass). Of 106 logged runs, 76 are full (>= 20 sessions; 4,542
-sessions), the rest smoke runs. The 59 full 31B runs give the speed table (4.1); one agent under
-converted caps on seven setups (8 runs, 2 shared with the matrix) gives the control (4.2), with 3 budget-response runs on one setup; 24 full 55-task runs (7 configurations run twice, the
-cross-hardware g31_v12e pair, 8 single runs) give the noise matrix (Section 5).
-
-### 4.1 Speed depends on the GPU and on concurrency
-
-All 59 full 31B runs by setup (Figure 1); tokens/s = each run's median per-session speed (E4B and 26B-A4B:
-`speed_groups.csv`).
+The table lists all 59 full runs of the 31B model by setup (Figure 1). In the "attempts" rows, each task is tried 2 or 3 times at once.
 
 | Setup (31B) | Sessions in parallel | Runs (sessions) | Tokens/s per session, median (range) | Factor vs scorer |
 |---|---|---|---|---|
@@ -114,22 +116,19 @@ All 59 full 31B runs by setup (Figure 1); tokens/s = each run's median per-sessi
 | L40S 48 GB | 5 | 1 (55) | 20.7 | 1.63 |
 | Kaggle 4x L4, TP4 | 10 | 6 (261) | 14.1 (13.2-15.8) | 2.13-2.55 |
 
-(1) **Concurrency matters as much as the GPU**: the scorer's own hardware at 10 sessions runs at factors 2.1-2.6, and
-the "attempts" rows (2 or 3 attempts per task at once, so 10 or 12 sessions) drop the RTX PRO 6000 from 38.1 to 26.4
-tokens/s and the A100 (partial run) from 30.5 to 16.9. (2) **Small changes move the factor**: a LoRA adapter cost
-7-16% of speed (Section 4.4). (3) **Speed is stable within a setup** (A100: factors 1.01-1.16 over 16 runs) **but not
-across nominally equal ones**: E4B runs on one RTX 5080 at 5 sessions ranged from 24 to 90 tokens/s, unexplained by
-the metadata. Calibrate every run.
+Three lessons:
 
-### 4.2 Normalization reproduces the scorer
+* **The number of parallel sessions matters as much as the GPU.** The scorer's own kind of machine, with 10 sessions at once, is 2.1-2.6x slower per session.
+* **Small changes move the factor.** A LoRA adapter (extra trained weights served with the model) cost 7-16% of speed. With adapter B on the RTX PRO 6000, sessions became 12% longer, which moves the projected total time on the scorer from 10.3-10.8 h to 11.6-12.1 h of the 12-hour limit.
+* **Speed is stable within a setup** (A100: factors 1.01-1.16 over 16 runs) **but not across runs that look equal** (E4B on one RTX 5080 GPU: 24 to 90 tokens/s). So calibrate every run.
 
-One agent (g31_v12e, budget 7 scorer minutes), the 55 train tasks, seven setups: if the conversion is right, converted
-caps should solve about as many tasks as the scorer and the nominal cap should not. The reference is the scorer setup
-itself: 4x L4, TP4, one session at a time, 7 minutes (two parts, as our kernel has a 150-minute deadline; one cut
-session rerun, hence 56 sessions). Converted caps were set before each run from 5
-calibration sessions (H100, L40S), an earlier run (RTX PRO 6000) or a guess from earlier 10-session runs (4x L4 at 10
-sessions: 2.13). The table gives the factor measured on the full run, so the realized budget is wall cap / f
-(Figure 2).
+### 4.2 Converted caps reproduce the scorer
+
+**The test.** We ran one agent (g31_v12e, budget 7 scorer minutes) on the 55 train tasks on seven setups. The
+reference is the scorer setup with its 7-minute cap. If the conversion is right, converted caps should match the reference and the nominal cap should not.
+
+**The caps** were set before each run, from a calibration of 5 sessions or from earlier runs on that setup. The table
+gives the factor measured afterwards on the full run, so the budget a run really got is cap / f (Figure 2).
 
 | Setup | f (full run) | Wall cap (set in advance) | Scorer min (cap / f) | Solved / 55 | Timed out | Overlap with scorer (both / scorer only / run only) |
 |---|---|---|---|---|---|---|
@@ -141,57 +140,40 @@ sessions: 2.13). The table gives the factor measured on the full run, so the rea
 | Kaggle 4x L4, 10 sessions, **nominal** | 2.55 | 7 min | **2.7** | **15** | **37** | 14 / 5 / 1 |
 | A100, 5 sessions (development reference) | 1.08 | 7 min | 6.5 | 17 | 12 | 14 / 5 / 3 |
 
-The four pre-calibrated runs land within one task of the scorer at factors from 0.65 to 2.40, although the pre-run
-factors missed the full-run factor by up to 12% (realized budgets 6.3-7.4 scorer minutes); the A100 run is within two. Per-task disagreements with the scorer are symmetric (McNemar p = 1.0 for the
-four pre-calibrated runs, 0.73 for the A100): converted runs solve different tasks, as repeated runs do, not fewer. The
-nominal run gets 2.7 scorer minutes: 37 of 55 sessions time out (no timed-out session was solved in any run), and it
-solves 4 fewer tasks than the scorer and 5 fewer than its converted twin on identical hardware. That gap is about 3 SD
-of a run-to-run difference (Section 5: run SD 1.13, so 1.6 for a difference); the paired per-task test (6 solved only
-when converted, 1 only when not; McNemar p = 0.13) is weaker, seeing only the 7 disagreeing tasks; the timeouts (37 vs
-7-15) show the mechanism.
+**Converted caps work.** The four runs calibrated in advance land within one task of the scorer, on machines from
+1.5x faster (f = 0.65) to 2.4x slower, although the factors estimated before the runs were off by up to 12% (realized
+budgets 6.3-7.4 scorer minutes). The A100 run (our earlier reference) is within two.
 
-**How much does a factor error cost?** On one setup (RTX PRO 6000, 5 sessions) we converted caps for 3.5, 7 and 10
-scorer minutes (`budget_curve.csv`): 16, 18 and 21 solved, with 35, 11 and 0 sessions timed out; the 7-minute point
-repeats the control row (19). The fitted slope is 0.76 tasks per scorer minute, so a 10% factor error
-at 7 minutes costs about half a task, below run noise, while the nominal cap's 2.6x error cost 4-5.
+**The nominal cap does not.** That run gets only 2.7 scorer minutes, and 37 of its 55 sessions time out (no timed-out
+session was solved in any run). It solves 4 fewer tasks than the scorer and 5 fewer than its converted twin on the
+same machine, about 3 SD of the difference between two identical runs. A paired McNemar test on the 7 tasks where the twins disagree gives p = 0.13.
 
-### 4.3 Why one factor works here, and what the fit shows
+**How much does an error in the factor cost?** On one setup (RTX PRO 6000, 5 sessions) we converted caps for budgets
+of 3.5, 7 and 10 scorer minutes (`budget_curve.csv`): 16, 18 and 21 tasks solved, or 0.76 tasks per scorer minute.
+So a 10% error in the factor at 7 minutes costs about half a task, less than the run-to-run noise; the nominal cap's
+2.6x error cost 4-5.
 
-One factor suffices when sessions are decode-bound. In all 76 full runs, model calls take 0.965-0.998 of session wall
-time; the per-call fit has median R^2 0.988 and puts prefill at 2.3% of model time (median; max 5.5%). Fitted
-coefficients (`timing_coefs.csv`; calls summed and the lowest R^2 shown over a setup's 1-2 runs; decode tokens/s =
-1000 / (b + d x context in thousands)):
+### 4.3 Why one factor works here
 
-| Setup (agent) | Calls (min R^2) | c, s | a, s / 1k prompt | b, s / 1k gen | d, s / 1k gen / 1k ctx | Decode tok/s, 0k / 24k ctx |
-|---|---|---|---|---|---|---|
-| 4x L4, 1 session, scorer (v12e) | 1,417 (0.999) | 0.12 | 0.46 | 26.6 | 0.19 | 37.5 / 32.1 |
-| 4x L4, 10 sessions (v12e) | 2,480 (0.955) | 0.41 | 0.89 | 62.5 | 0.23 | 16.1 / 14.7 |
-| H100 SXM, 5 sessions (v12e) | 1,498 (0.985) | 0.08 | 0.25 | 17.0 | 0.14 | 58.8 / 48.9 |
-| L40S, 5 sessions (v12e) | 1,549 (0.988) | 0.22 | 0.39 | 45.5 | 0.07 | 22.0 / 21.2 |
-| RTX PRO 6000, 5 sessions (v15) | 3,047 (0.990) | 0.26 | 0.17 | 23.5 | 0.08 | 42.6 / 39.5 |
-| RTX PRO 6000, + adapter B (v15) | 2,659 (0.991) | 0.08 | 0.24 | 26.3 | 0.07 | 38.0 / 35.6 |
-
-Decode `b` dominates and carries the hardware difference: ten sessions on 4x L4 more than double it and triple per-call
-overhead `c`, while prefill `a` stays under a second per 1k new tokens thanks to prefix caching. `d` varies (decode at 24k
-is 14% slower than at 0k on the scorer, 4% on the L40S), but one agent builds similar contexts everywhere, so a
-run-level factor absorbs it. The exception is heavy sharing: at 10 sessions, late calls run up to
-27% faster than early ones as sessions finish, and table 4.3's lowest R^2 (0.955) is there, so a run-level factor under-converts a run's start and over-converts its end.
-
-### 4.4 A LoRA adapter changes the factor
-
-Adapter B (rank 16, tuned on solved sessions) on the RTX PRO 6000: 35.4 vs 38.1 tokens/s; the fit puts the
-cost in decode (`b` +12%; +11% at 24k context). Overhead `c` falls while prefill `a` rises; the
-two are hard to separate in the fit, so we do not read them individually. In two held-out runs the adapter changed no score
-beyond noise (20.5 vs 19.0 of 55) but lengthened sessions by 12%, moving the projected scorer time from 10.3-10.8 h to
-11.6-12.1 h of the 12-hour limit. Adapter A on an A100: 16% slower than its paired base run. Recalibrate after any
-change to what is served.
+The condition of Section 3.2 holds here. In all 76 full runs, model calls take 0.965-0.998 of session time. Within
+model calls, prefill takes only 2.3% of the time (median; max 5.5%), because the server caches the part of the prompt
+it has already read. Decode carries the hardware difference: per 1k tokens written, the scorer setup needs 26.6 s,
+the same machine with 10 sessions 62.5 s, and the H100 17.0 s (`timing_coefs.csv`).
+Decode slows as the conversation grows (at 24k tokens, by 14% on the scorer and 4% on the L40S), but one agent builds
+similar conversations on every machine, so one factor absorbs it. The exception is heavy sharing: with 10 sessions at
+once, late calls run up to 27% faster than early ones, as other sessions finish.
 
 ## 5. Noise
 
+The `noise` command takes one row per run and task. It reports the SD of the score between identical runs and a
+task-level SD that treats each task as a coin with its own solve rate; from these, the runs needed to detect a margin
+and the chance that one run each ranks two agents wrongly. `draws` does the same for single leaderboard scores.
+
+
 ### 5.1 Local runs
 
-Repeated full runs on the same 55 tasks (7 scorer minutes; A100 for the first four configs, RTX PRO 6000 converted
-otherwise):
+Repeated full runs on the same 55 tasks (7 scorer minutes; A100 for the first four configurations, RTX PRO 6000 with
+converted caps otherwise).
 
 | Config | Split | Solved per run |
 |---|---|---|
@@ -200,45 +182,46 @@ otherwise):
 | g31_v9c / g31_v15 | train | 15, 13 / 19, 21 |
 | g31_v15 / g31_v15 + adapter B | held-out | 18, 20 / 20, 21 |
 
-4-6 of 55 tasks flip between identical runs. The pool excludes the cross-hardware g31_v12e pair, so it is independent of
-the conversion. Pooled run SD: 1.14 tasks on train, 1.12 on held-out, **1.13 over both (95% CI
-0.75-2.31, 7 dof)**; task-level SD 1.52 and 1.66. One run each ranks a true 2-task margin wrongly 11% of the time with the run SD and **20%** with the larger task-level SD
-(1.66, held-out; 11% with two runs each), which we use for comparisons; a 1-task margin 34%; 80% power for a 2-task margin takes **11 runs** per agent. The cross-hardware pair differs by 0.9
-train task-level SD of a difference (1.3 run-level SD), no more than identical runs.
+Between two identical runs, 4-6 of the 55 tasks flip: solved in one run, not in the other. Pooled over the seven
+repeated pairs (without the g31_v12e pair, which ran on two machines), the run SD is 1.14 tasks on train, 1.12 on
+held-out, **1.13 over both (95% CI 0.75-2.31, 7 dof)**; the task-level SD is 1.52 and 1.66.
+
+When two agents are compared with one run each, a true 2-task margin is ranked wrongly 11% of the time with the run SD
+and **20%** with the larger task-level SD (1.66; 11% with two runs each); a
+1-task margin, 34%. Detecting a 2-task margin with 80% power takes **11 runs** per agent.
 
 ### 5.2 The leaderboard
 
-Public scores are single draws on ~58 hidden tasks. Resubmissions of identical files vary with an SD of 1.4-1.8 tasks
-[D. Afshar; forum]: one public notebook that scored 13/58 scored 7 and 9 for others who resubmitted it, and 9 for us.
-With SD 1.6, one draw's 95% interval is about +-3 tasks (`draws --sd 1.6 --score 9`: 5.9-12.1). Levels also differ
-(24-40% of local splits vs 5-18% of hidden tasks: unseen private repositories), which no noise model explains.
+The public leaderboard shows one score per submission, on about 58 of the hidden tasks. Resubmissions of identical
+files vary with an SD of 1.4-1.8 tasks [D. Afshar; forum]. With SD 1.6, the 95% interval of one score is about +-3 tasks (`draws --sd 1.6 --score 9`:
+5.9-12.1).
 
 ## 6. Protocol
 
-1. **Log every model call** with timestamps and token usage.
-2. **Measure the reference speed** on the scoring setup at its real concurrency.
-3. **Calibrate every run**: wall cap = budget x f; report f with its CI.
-4. **Check the assumption** (`timing`); if flagged, measure on the scorer.
+1. **Log every model call** with timestamps and token counts.
+2. **Measure the reference speed** on the scoring setup, at the load it scores with.
+3. **Calibrate every run**: cap = budget x f; report f with its CI.
+4. **Check the assumption** (`timing`); if a run is flagged, measure on the scorer.
 5. **Report budgets in scorer minutes**, with timeouts and projected total time.
 6. **Run every configuration at least twice**; report the pooled SD and runs needed before claiming a margin.
-7. **Read a leaderboard draw as an interval**, not a rank.
+7. **Read a leaderboard score as an interval**, not a rank.
 
 ## 7. Limitations
 
-A run-level factor averages over the drift that heavy concurrency causes (Section 4.3). One model family, one harness and Python repositories: tool-heavy
-agents are less model-bound, which `timing` detects but one factor would not fix. The scorer reference rests on one
-machine type (61 sequential sessions on Kaggle 4x L4, 32.9-33.8 tokens/s); host-to-host variation is not measured.
-Only one converted setup was repeated (19, 18). Noise estimates rest on seven repeated pairs, the task-level SD assumes independent tasks,
-and leaderboard noise is partly community-reported.
+* One factor per run averages over the drift that heavy sharing causes.
+* One model family, one agent program, Python projects only; agents that spend much time in tools need more than one factor.
+* The scorer reference rests on one kind of machine (61 sessions on Kaggle 4x L4, 32.9-33.8 tokens/s); variation between hosts is not measured.
+* Only one converted setup was repeated (19, 18).
+* Noise estimates rest on seven repeated pairs; the task-level SD assumes independent tasks; leaderboard noise is partly community-reported.
 
 ## 8. Conclusion
 
-A wall-clock cap is a hardware setting unless converted. One factor from per-call logs, checked against the same logs,
-makes local results comparable to the scorer's; two runs and a pooled SD make them comparable to each other. Nothing
-here is specific to Gemma or this competition: any timed, decode-bound agent benchmark can use the same logs and
-commands.
+A time limit is a hardware setting until it is converted. One factor from the logs of model calls, checked against the
+same logs, makes local results comparable to the scorer's; two runs and a pooled SD make them comparable to each
+other. Any timed benchmark whose agents spend their time in the model can use the same logs and commands.
 
-**Reproducibility.** Toolkit and tests (`toolkit/`, Apache-2.0), notebook, data with data card (`data/`) and the
-scripts behind every table: github.com/akanksha28pathak/scorer-minutes-paper. Data: `speed_table.csv`
-(106 runs), `speed_groups.csv` (4.1), `control_43.csv`, `control_twin.csv` and `budget_curve.csv` (4.2), `lora_sessions.csv` (4.4), `timing_coefs.csv` and `timing/` (4.3), `noise_long.csv`
-(task id x run matrix), `run_labels.tsv`; no task content. Serving: vLLM 0.19.1, it-qat-w4a16 checkpoints.
+**Reproducibility.** Toolkit and tests (`toolkit/`, Apache-2.0), notebook, data with data card (`data/README.md`) and
+the scripts behind every table: github.com/akanksha28pathak/scorer-minutes-paper. The data card describes the tasks, the two splits and every file. The
+tasks, the agent program and its documentation (`HARNESS_README.md`) are on the competition's data page
+(kaggle.com/competitions/gemma-4-developer-agent/data) and may not be redistributed, so our files carry anonymous task
+ids and no task content. Serving: vLLM 0.19.1, it-qat-w4a16 checkpoints.

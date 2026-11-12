@@ -17,8 +17,8 @@ Key results (all from `data/`):
   19-20; the unconverted cap solved 15 with 37 of 55 sessions timed out.
 * Budget curve (3.5 / 7 / 10 scorer minutes on one setup): 16 / 18 / 21 solved, about 0.76 tasks per scorer minute, so a
   10% factor error costs about half a task.
-* Per-call timing fit (overhead, prefill, decode, context slowdown) from client logs alone; a LoRA adapter slows decode
-  12% and pushes the agent toward the 12-hour limit.
+* Per-call timing fit (overhead, prefill, decode, context slowdown) from client logs alone; a LoRA adapter makes
+  sessions 12% longer and pushes the agent toward the 12-hour limit.
 * Noise: identical runs differ by an SD of 1.1-1.7 tasks of 55; one run each ranks a 2-task gap wrongly 11-20% of the time.
 
 ## This folder (everything for the submission; the shareable public copy is built separately)
@@ -27,10 +27,10 @@ Key results (all from `data/`):
 |---|---|
 | `CHECKLIST.md` | Step-by-step for filling the Kaggle Writeup form (start here) |
 | `FIELDS.md` | Title, subtitle, track, card image, figure captions, links, author, word count |
-| `body.md` | Writeup body to paste (2,960 words with captions; limit 3,000), figures placed after tables 4.1 and 4.2 |
+| `body.md` | Writeup body to paste (2,985 words with captions; limit 3,000), figures placed after tables 4.1 and 4.2 |
 | `card.png`, `fig1_speed.png`, `fig2_control.png` | Card image and the two figures |
-| `notebook/scorer_minutes_demo.ipynb` | Demo notebook, executed: synthetic check of the toolkit, then tables 4.1-4.3 and the noise numbers rebuilt from the data |
-| `data/` | Aggregates behind every table, with a data card (`data/README.md`); task ids anonymized, no task content |
+| `notebook/scorer_minutes_demo.ipynb` | Demo notebook, executed: synthetic check of the toolkit, then tables 4.1-4.2, the timing fits of section 4.3 and the noise numbers rebuilt from the data |
+| `data/` | Aggregates behind every table, with a data card (`data/README.md`: files, tasks and splits); task ids anonymized, no task content |
 | `scorer-minutes.zip` | The toolkit (Python standard library only): source, tests, README, Apache-2.0 license, citation |
 
 ## Sources and reproduction (main repo)
