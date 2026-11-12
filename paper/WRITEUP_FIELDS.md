@@ -4,8 +4,7 @@ Fill these into the Writeup form (Akanksha, Nov 9). Everything to paste or uploa
 (built by `scripts/paper/build_submission.py`; body = the draft from "## Abstract" on, with the figures placed).
 
 * **Title (76 characters; the form allows 80):** Scorer-minutes: hardware-normalized, noise-aware evaluation of coding agents
-* **Subtitle (one line, 122 characters):** One measured speed factor makes a wall-clock cap the same budget on any GPU;
-  repeated runs show what a one-task gap means.
+* **Subtitle (one line, 66 characters):** A toolkit for comparing time-limited coding agents across machines
 * **Track / prize:** Best New Resource (toolkit + per-run dataset + protocol).
 * **Card image:** `docs/paper/figures/fig2_control.png`.
 * **Figures in the body** (placed by `scripts/paper/build_submission.py`):
